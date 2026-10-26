@@ -30,7 +30,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.45;font-size:15px}
-header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
 .bar{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{font-weight:700;font-size:18px;letter-spacing:-.01em}
 .brand small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
@@ -182,8 +183,9 @@ td.r,th.r{text-align:right;white-space:nowrap}
           <div class="btns">
             <button class="btn primary" id="save">Guardar</button>
             <button class="btn" id="printBtn">Imprimir / PDF</button>
-            <button class="btn" id="wa">WhatsApp</button>
-            <button class="btn" id="mail">Email</button>
+            <a class="btn" id="wa" target="_blank" rel="noopener" style="text-decoration:none">WhatsApp</a>
+            <a class="btn" id="mail" style="text-decoration:none">Email</a>
+            <button class="btn" id="copy">Copiar texto</button>
             <button class="btn" id="dup">Duplicar</button>
             <button class="btn" id="reset">Nuevo</button>
           </div>
@@ -299,6 +301,55 @@ const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
 
 function readJSON(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } }
 function writeJSON(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+
+// Estilos de la hoja descargada (archivo aparte que se imprime al abrirlo).
+const PRINT_CSS = `:root{--accent:#0b5cad;--warn:#9a5b00;--seat:#5b6270;--seat2:#9aa1ad;--muted:#5d6470;--card:#fff;--text:#000}
+  *{box-sizing:border-box;margin:0;padding:0} @page{margin:12mm}
+  body{font-family:Inter,system-ui,sans-serif;font-size:11.5px;line-height:1.45;color:#000;background:#fff;padding:12mm}
+  @media print{body{padding:0}}
+  h1{font-size:22px} h3{font-size:12px;margin:14px 0 4px;text-transform:uppercase;letter-spacing:.05em}
+  table{width:100%;border-collapse:collapse;table-layout:fixed} th,td{text-align:left;padding:4px 6px;border-bottom:1px solid #ddd;vertical-align:top}
+  td.r{text-align:right;white-space:nowrap} .tot td{border:0} .tot .big td{font-size:18px;font-weight:700;border-top:2px solid #000;padding-top:8px}
+  .tag{font-size:10px;font-weight:600;padding:1px 5px;border-radius:4px;border:1px solid #999}
+  .plan svg{width:100%;height:auto;display:block}`;
+
+// ---------- Almacenamiento ----------
+// Publicada como Artifact de claude.ai usa la base de datos compartida (db);
+// abierta como archivo normal, el localStorage del navegador.
+let DB = null, DL = null, LIST = readJSON(KEY, []);
+const store = {
+  async savePres(p){
+    if(DB){ await DB.collection('presupuestos').doc(p.ref).set(clone(p)); return true; }
+    const i = LIST.findIndex(x=>x.ref===p.ref); if(i>=0) LIST[i]=clone(p); else LIST.push(clone(p));
+    return writeJSON(KEY, LIST);
+  },
+  async delPres(ref){
+    if(DB) return DB.collection('presupuestos').doc(ref).delete();
+    LIST = LIST.filter(p=>p.ref!==ref); writeJSON(KEY, LIST);
+  },
+  saveTarifa(){
+    clearTimeout(store._t);
+    store._t = setTimeout(() => DB ? DB.doc('config/tarifa').set(clone(tarifa)).catch(()=>toast('No se pudo guardar la tarifa')) : writeJSON(KEY_T, tarifa), DB ? 600 : 0);
+  },
+};
+async function connect(){
+  const use = window.claude?.use;
+  if(!use) return;
+  [DB, DL] = await Promise.all([use('db').catch(()=>null), use('downloads').catch(()=>null)]);
+  if(DL) $('printBtn').textContent = 'Descargar presupuesto';
+  if(!DB) return;
+  LIST = [];
+  DB.collection('presupuestos').onSnapshot(snap => {
+    LIST = snap.docs.map(d => d.data()).sort((a,b) => a.fecha - b.fecha);
+    renderList();
+  }, () => {});
+  DB.doc('config/tarifa').onSnapshot(snap => {
+    if(!snap.exists) return;
+    tarifa = Object.assign(defaultTarifa(), clone(snap.data()));
+    if(!$('viewTar').contains(document.activeElement)) renderTarifas();
+    if(!$('viewConf').classList.contains('hidden')) { renderModels(); refreshPriceLabels(); renderSummary(); }
+  }, () => {});
+}
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -312,7 +363,6 @@ function defaultTarifa(){
   return t;
 }
 let tarifa = Object.assign(defaultTarifa(), readJSON(KEY_T, {}));
-const saveTarifa = () => writeJSON(KEY_T, tarifa);
 
 // ---------- Presupuesto ----------
 let state = fresh();
@@ -430,6 +480,7 @@ function renderSummary(){
   $('totals').innerHTML = totalsHtml(state);
   const p = pending(state);
   $('pend').innerHTML = p.length ? `<div class="alert"><b>${p.length} punto(s) a consultar, no incluidos en el total:</b> ${p.map(esc).join(' · ')}</div>` : '';
+  updateLinks();
   $('noPrices').classList.toggle('hidden', MODELS.some(m => num(tarifa.base[m.id])));
 }
 const FIELDS = ['cliente','cif','telefono','email','direccion','descuento','iva','validez','entrega','pago','obs'];
@@ -488,9 +539,8 @@ function renderPrint(s){
 }
 
 // ---------- Lista ----------
-const loadList = () => readJSON(KEY, []);
 function renderList(){
-  const list = loadList(), q = $('search').value.toLowerCase(), f = $('filter').value;
+  const list = LIST, q = $('search').value.toLowerCase(), f = $('filter').value;
   $('count').textContent = list.length ? `(${list.length})` : '';
   const rows = list.slice().reverse().filter(p => (!f || p.estado===f) && (!q || (p.ref+' '+p.cliente).toLowerCase().includes(q)));
   $('rows').innerHTML = rows.length ? rows.map(p => `
@@ -542,8 +592,8 @@ $('addExtra').onclick = () => { state.extras.push({concepto:'',importe:''}); ren
 $('extras').addEventListener('input', e => { const k=e.target.dataset.ex; if(k!=null){ state.extras[k][e.target.dataset.f]=e.target.value; renderSummary(); } });
 $('extras').addEventListener('click', e => { const k=e.target.dataset.rm; if(k!=null){ state.extras.splice(k,1); renderExtras(); renderSummary(); } });
 
-$('save').onclick = () => {
-  const list = loadList();
+$('save').onclick = async () => {
+  const list = LIST;
   if(!state.ref){
     const y = new Date().getFullYear();
     const nums = list.filter(p=>p.ref.startsWith(`P-${y}-`)).map(p=>+p.ref.split('-')[2]);
@@ -551,16 +601,27 @@ $('save').onclick = () => {
     state.fecha = Date.now();
   }
   if(!state.tarifa) state.tarifa = clone(tarifa); // congela los precios usados
-  const i = list.findIndex(p=>p.ref===state.ref);
-  if(i>=0) list[i]=clone(state); else list.push(clone(state));
-  toast(writeJSON(KEY, list) ? `Presupuesto ${state.ref} guardado` : 'No se pudo guardar en este navegador');
+  try{ await store.savePres(state); toast(`Presupuesto ${state.ref} guardado`); }
+  catch(e){ toast('No se pudo guardar. Comprueba la conexión e inténtalo de nuevo.'); }
   renderSummary(); renderList();
 };
-$('printBtn').onclick = () => { renderPrint(state); window.print(); };
-$('wa').onclick = () => window.open(`https://wa.me/${(state.telefono||'').replace(/\D/g,'')}?text=${encodeURIComponent(textSummary(state))}`, '_blank');
-$('mail').onclick = () => {
-  location.href = `mailto:${encodeURIComponent(state.email||'')}?subject=${encodeURIComponent('Presupuesto '+(state.ref||'')+' — '+title(state))}&body=${encodeURIComponent(textSummary(state).replace(/\*/g,''))}`;
+$('printBtn').onclick = async () => {
+  renderPrint(state);
+  if(!DL) return window.print();
+  const doc = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Presupuesto ${esc(state.ref||'borrador')}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>${PRINT_CSS}</style></head><body><div id="print">${$('print').innerHTML}</div><script>onload=()=>setTimeout(print,300)<\/script></body></html>`;
+  try{ await DL.save({filename:`Presupuesto ${state.ref||'borrador'}.html`, data:doc}); toast('Abre el archivo descargado para imprimirlo o guardarlo en PDF'); }
+  catch(e){ if(e?.code!=='declined') toast('No se pudo descargar el presupuesto'); }
 };
+$('copy').onclick = async () => {
+  try{ await navigator.clipboard.writeText(textSummary(state).replace(/\*/g,'')); toast('Texto copiado'); }
+  catch(e){ toast('No se pudo copiar'); }
+};
+function updateLinks(){
+  $('wa').href = `https://wa.me/${(state.telefono||'').replace(/\D/g,'')}?text=${encodeURIComponent(textSummary(state))}`;
+  $('mail').href = `mailto:${encodeURIComponent(state.email||'')}?subject=${encodeURIComponent('Presupuesto '+(state.ref||'')+' — '+title(state))}&body=${encodeURIComponent(textSummary(state).replace(/\*/g,''))}`;
+}
 $('dup').onclick = () => {
   state = Object.assign(clone(state), {ref:null, fecha:null, tarifa:null, estado:'Borrador'});
   renderConf(); toast('Copia creada con la tarifa actual. Guárdala para darle número.');
@@ -572,27 +633,34 @@ $('filter').innerHTML += ESTADOS.map(e=>`<option>${e}</option>`).join('');
 $('filter').onchange = renderList;
 $('rows').addEventListener('change', e => {
   const r = e.target.dataset.st; if(!r) return;
-  const list = loadList(), p = list.find(x=>x.ref===r); p.estado = e.target.value; writeJSON(KEY, list);
+  const p = clone(LIST.find(x=>x.ref===r)); p.estado = e.target.value;
+  store.savePres(p).catch(()=>toast('No se pudo cambiar el estado'));
   if(state.ref===r) state.estado = p.estado;
 });
 $('rows').addEventListener('click', e => {
   const o=e.target.dataset.open, d=e.target.dataset.del;
-  if(o){ state = Object.assign(fresh(), clone(loadList().find(p=>p.ref===o))); ALL.forEach(i=>{ if(!(i.id in state.opts)) state.opts[i.id]=i.def; }); syncForm(); show('conf'); }
-  if(d && confirm(`¿Borrar el presupuesto ${d}?`)){ writeJSON(KEY, loadList().filter(p=>p.ref!==d)); renderList(); }
+  if(o){ state = Object.assign(fresh(), clone(LIST.find(p=>p.ref===o))); ALL.forEach(i=>{ if(!(i.id in state.opts)) state.opts[i.id]=i.def; }); syncForm(); show('conf'); }
+  // Confirmación en dos pasos dentro de la página (sin confirm()).
+  if(d){
+    if(e.target.dataset.sure){ store.delPres(d).then(renderList, ()=>toast('No se pudo borrar')); }
+    else { e.target.dataset.sure = 1; e.target.textContent = '¿Seguro? Pulsa otra vez'; setTimeout(()=>{ delete e.target.dataset.sure; e.target.textContent='Borrar'; }, 4000); }
+  }
 });
-$('exportBtn').onclick = () => {
+$('exportBtn').onclick = async () => {
+  const data = JSON.stringify({presupuestos:LIST, tarifa},null,2), filename = `presupuestos-${new Date().toISOString().slice(0,10)}.json`;
+  if(DL){ try{ await DL.save({filename, data}); }catch(e){ if(e?.code!=='declined') toast('No se pudo descargar la copia'); } return; }
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify({presupuestos:loadList(), tarifa},null,2)],{type:'application/json'}));
-  a.download=`presupuestos-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=filename; a.click();
 };
 $('importFile').onchange = async e => {
   try{
     const data = JSON.parse(await e.target.files[0].text());
     const inc = Array.isArray(data) ? data : data.presupuestos || [];
-    const list = loadList(); inc.forEach(p => { if(p.ref && !list.some(x=>x.ref===p.ref)) list.push(p); });
-    writeJSON(KEY, list);
-    if(data.tarifa && confirm('¿Cargar también las tarifas de la copia? (sustituye las actuales)')){ tarifa = Object.assign(defaultTarifa(), data.tarifa); saveTarifa(); }
-    renderList(); toast('Copia importada');
+    const nuevos = inc.filter(p => p.ref && !LIST.some(x=>x.ref===p.ref));
+    for(const p of nuevos) await store.savePres(p);
+    // La tarifa de la copia solo se carga si aquí aún no hay precios.
+    if(data.tarifa && !MODELS.some(m => num(tarifa.base[m.id]))){ tarifa = Object.assign(defaultTarifa(), data.tarifa); store.saveTarifa(); }
+    renderList(); toast(`${nuevos.length} presupuesto(s) importado(s)`);
   }catch(err){ toast('Archivo no válido'); }
   e.target.value='';
 };
@@ -605,10 +673,10 @@ $('viewTar').addEventListener('input', e => {
   else if(d.te) tarifa.extras[d.te] = num(e.target.value);
   else if(d.ts) (tarifa.sel[d.ts] ||= {})[d.to] = num(e.target.value);
   else return;
-  saveTarifa();
+  store.saveTarifa();
 });
 
-syncForm(); renderConf(); renderList();
+syncForm(); renderConf(); renderList(); connect();
 </script>
 </body>
 </html>
