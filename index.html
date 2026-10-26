@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torresbus Configurador Sprinter</title>
+<meta name="description" content="Configurador y hojas de pedido de minibuses Mercedes-Benz Sprinter de 16, 20 y 30 plazas más conductor.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --text:#16181d; --muted:#5d6470; --line:#e1e4ea;
+  --accent:#0b5cad; --accent-soft:#e6f0fb; --ok:#1f7a3f; --ok-soft:#e5f4ea;
+  --warn:#9a5b00; --warn-soft:#fff3dc; --no:#a32222; --no-soft:#fbe7e7;
+  --seat:#5b6270; --seat2:#9aa1ad; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1115; --card:#181b21; --text:#e9ebef; --muted:#9aa1ad; --line:#2a2f38;
+    --accent:#5aa2ef; --accent-soft:#16283d; --ok:#5cc17e; --ok-soft:#14291c;
+    --warn:#f0b04a; --warn-soft:#2e2412; --no:#f07a7a; --no-soft:#2f1717;
+    --seat:#c3c8d1; --seat2:#6d7480;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1115; --card:#181b21; --text:#e9ebef; --muted:#9aa1ad; --line:#2a2f38;
+  --accent:#5aa2ef; --accent-soft:#16283d; --ok:#5cc17e; --ok-soft:#14291c;
+  --warn:#f0b04a; --warn-soft:#2e2412; --no:#f07a7a; --no-soft:#2f1717;
+  --seat:#c3c8d1; --seat2:#6d7480;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.45;font-size:15px}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.bar{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:18px;letter-spacing:-.01em}
+.brand small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+nav{margin-left:auto;display:flex;gap:6px}
+nav button{border:1px solid var(--line);background:transparent;color:var(--text);padding:8px 12px;border-radius:8px;font:inherit;font-weight:500;cursor:pointer}
+nav button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+main{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+h2{font-size:16px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+h2 .n{background:var(--accent-soft);color:var(--accent);border-radius:50%;width:24px;height:24px;display:inline-grid;place-items:center;font-size:13px}
+.models{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.models{grid-template-columns:minmax(0,1fr)}}
+.model{border:2px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;background:transparent;color:inherit;text-align:left;font:inherit}
+.model.sel{border-color:var(--accent);background:var(--accent-soft)}
+.model b{font-size:26px;display:block;line-height:1.1}
+.model span{color:var(--muted);font-size:13px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.opt .t{font-weight:500}
+.opt .d{font-size:12.5px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--muted);padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on[data-v="si"]{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.seg button.on[data-v="no"]{background:var(--no-soft);color:var(--no);font-weight:600}
+.seg button.on[data-v="consultar"]{background:var(--warn-soft);color:var(--warn);font-weight:600}
+@media (max-width:560px){.opt{grid-template-columns:minmax(0,1fr)}}
+label.f{display:block;font-size:13px;color:var(--muted);margin-bottom:10px}
+label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:4px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.sticky{position:sticky;top:76px}
+.sum h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 6px}
+.sum ul{list-style:none;display:grid;gap:4px;font-size:14px}
+.sum li{display:flex;gap:8px}
+.tag{font-size:11px;font-weight:600;padding:2px 6px;border-radius:5px;flex:none;align-self:flex-start;margin-top:2px}
+.tag.si{background:var(--ok-soft);color:var(--ok)}
+.tag.no{background:var(--no-soft);color:var(--no)}
+.tag.consultar{background:var(--warn-soft);color:var(--warn)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);padding:9px 12px;border-radius:8px;font:inherit;font-weight:500;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--no)}
+.plan{background:var(--bg);border-radius:10px;padding:10px;margin-top:6px}
+.plan svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.alert{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tablewrap{overflow-x:auto}
+.empty{color:var(--muted);text-align:center;padding:30px}
+.hidden{display:none!important}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:500;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+#print{display:none}
+@media print{
+  body{background:#fff;color:#000;font-size:12px}
+  header,main,.toast{display:none!important}
+  #print{display:block;padding:10mm}
+  #print h1{font-size:20px;margin-bottom:4px}
+  #print h3{font-size:13px;margin:12px 0 4px;border-bottom:1px solid #999;padding-bottom:2px}
+  #print table td,#print table th{padding:4px 6px;border-bottom:1px solid #ddd;color:#000}
+  #print .plan{background:#fff}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Torresbus · Sprinter<small>Configurador de minibuses Mercedes-Benz Sprinter</small></div>
+    <nav>
+      <button id="tabConf" class="active">Configurar</button>
+      <button id="tabList">Pedidos <span id="count"></span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="viewConf">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2><span class="n">1</span>Modelo</h2>
+          <div class="models" id="models"></div>
+        </div>
+
+        <div class="card">
+          <h2><span class="n">2</span>Equipamiento</h2>
+          <div id="groups"></div>
+        </div>
+
+        <div class="card">
+          <h2><span class="n">3</span>Cliente y pedido</h2>
+          <div class="row2">
+            <label class="f">Cliente / empresa<input id="cliente" autocomplete="organization"></label>
+            <label class="f">Teléfono<input id="telefono" type="tel" autocomplete="tel"></label>
+            <label class="f">Email<input id="email" type="email" autocomplete="email"></label>
+            <label class="f">Precio (€, opcional)<input id="precio" type="number" min="0" step="100"></label>
+          </div>
+          <label class="f">Observaciones<textarea id="obs" rows="3" placeholder="Plazos, matriculación, financiación…"></textarea></label>
+        </div>
+      </div>
+
+      <aside class="sticky">
+        <div class="card sum">
+          <h2>Resumen</h2>
+          <div id="sumTitle" style="font-weight:600;font-size:17px"></div>
+          <div class="plan" id="plan"></div>
+          <div class="legend">
+            <span>■ Conductor</span><span>■ Pasajero</span><span>🎤 Micro pilar asiento 1</span>
+          </div>
+          <div id="sumBody"></div>
+          <div id="pend"></div>
+          <div class="btns">
+            <button class="btn primary" id="save">Guardar pedido</button>
+            <button class="btn" id="printBtn">Imprimir / PDF</button>
+            <button class="btn" id="wa">WhatsApp</button>
+            <button class="btn" id="mail">Email</button>
+            <button class="btn" id="reset">Nuevo</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="viewList" class="hidden">
+    <div class="card">
+      <h2>Pedidos guardados</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Se guardan en este navegador. Exporta una copia para no perderlos.</p>
+      <div class="btns" style="margin:0 0 12px">
+        <button class="btn" id="exportBtn">Exportar (.json)</button>
+        <label class="btn">Importar<input type="file" id="importFile" accept=".json" hidden></label>
+      </div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Ref.</th><th>Fecha</th><th>Cliente</th><th>Modelo</th><th>Pendiente consultar</th><th>Precio</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+    </div>
+  </section>
+</main>
+
+<div id="print"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const MODELS = [
+  {id:16, label:'16 + 1', desc:'16 pasajeros + conductor', cols:3},
+  {id:20, label:'20 + 1', desc:'20 pasajeros + conductor', cols:3},
+  {id:30, label:'30 + 1', desc:'30 pasajeros + conductor', cols:4},
+];
+
+// Equipamiento según la hoja de especificaciones del cliente.
+// type "tri": si / no / consultar.  type "sel": desplegable.
+const GROUPS = [
+  {title:'Mecánica y exterior', items:[
+    {id:'motor', t:'Motor Sprinter 190 CV', type:'tri', def:'si'},
+    {id:'cambio', t:'Cambio automático', type:'tri', def:'si'},
+    {id:'retarder', t:'Retarder', type:'tri', def:'si'},
+    {id:'led', t:'Faros LED', type:'tri', def:'si'},
+    {id:'deposito', t:'Depósito de gasoil grande (90 litros)', type:'tri', def:'consultar'},
+    {id:'parrilla', t:'Parrilla delantera no original', type:'tri', def:'consultar'},
+    {id:'color', t:'Color exterior', type:'sel', def:'Negro', options:['Negro','Blanco','Gris plata','Gris oscuro','Azul','Otro (ver observaciones)']},
+  ]},
+  {title:'Habitáculo de pasajeros', items:[
+    {id:'guia', t:'Asiento de guía', d:'Configuración sin guía', type:'tri', def:'no'},
+    {id:'tapiceria', t:'Tapicería asientos', type:'sel', def:'Polipiel negro y gris', options:['Polipiel negro y gris','Polipiel negro','Polipiel gris','Tela','Otro (ver observaciones)']},
+    {id:'cortinas', t:'Cortinas', type:'sel', def:'Gris', options:['Gris','Negro','Beige','Sin cortinas']},
+    {id:'mesitas', t:'Butacas con mesitas y portapapeles', type:'tri', def:'si'},
+    {id:'micro', t:'Micrófono en el pilar del asiento 1', type:'tri', def:'si'},
+    {id:'enchufe', t:'Enchufe 220 V', type:'tri', def:'consultar'},
+    {id:'dvd', t:'DVD', type:'tri', def:'no'},
+    {id:'nevera', t:'Nevera', type:'tri', def:'no'},
+  ]},
+  {title:'Puesto de conductor', items:[
+    {id:'asientoCond', t:'Asiento conductor en polipiel', type:'tri', def:'si'},
+    {id:'suspension', t:'Asiento conductor con suspensión independiente', type:'tri', def:'si'},
+    {id:'cajon', t:'Cajón portapapeles', type:'tri', def:'no'},
+  ]},
+  {title:'Equipaje', items:[
+    {id:'maletero', t:'Maletero gigante', type:'tri', def:'si'},
+    {id:'portaeq', t:'Portaequipajes en maletero (2–3 niveles)', type:'tri', def:'consultar'},
+  ]},
+];
+const ALL = GROUPS.flatMap(g => g.items);
+const TRI = {si:'Sí', no:'No', consultar:'Consultar'};
+const KEY = 'torresbus_pedidos_v1';
+const $ = id => document.getElementById(id);
+
+let state = fresh();
+function fresh(){
+  const s = {model:16, opts:{}, cliente:'', telefono:'', email:'', precio:'', obs:'', ref:null};
+  ALL.forEach(i => s.opts[i.id] = i.def);
+  return s;
+}
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } }
+function store(list){ try{ localStorage.setItem(KEY, JSON.stringify(list)); return true; }catch(e){ return false; } }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+const model = () => MODELS.find(m => m.id === state.model);
+
+function renderModels(){
+  $('models').innerHTML = MODELS.map(m => `
+    <button class="model ${m.id===state.model?'sel':''}" data-m="${m.id}">
+      <b>${m.label}</b><span>Mercedes-Benz Sprinter<br>${m.desc}</span>
+    </button>`).join('');
+}
+
+function renderGroups(){
+  $('groups').innerHTML = GROUPS.map(g => `
+    <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px">${g.title}</h3>
+    <div class="opts">${g.items.map(optHtml).join('')}</div>`).join('');
+}
+function optHtml(i){
+  const v = state.opts[i.id];
+  const ctl = i.type === 'tri'
+    ? `<div class="seg" data-o="${i.id}">${Object.keys(TRI).map(k=>`<button data-v="${k}" class="${v===k?'on':''}">${TRI[k]}</button>`).join('')}</div>`
+    : `<select data-s="${i.id}" style="padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit">${i.options.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
+  return `<div class="opt"><div><div class="t">${i.t}</div>${i.d?`<div class="d">${i.d}</div>`:''}</div>${ctl}</div>`;
+}
+
+// Plano en planta: conductor delante a la izquierda, asiento 1 con micro.
+function planSvg(m, mic){
+  const cols = m.cols, n = m.id, rows = Math.ceil(n/cols);
+  const s=26, g=6, aisle=18, pad=12, front=46;
+  const leftCols = cols===4?2:1, rightCols = cols-leftCols;
+  const w = pad*2 + cols*s + (cols-1)*g + aisle;
+  const h = front + rows*(s+g) + 40;
+  const x = c => pad + c*(s+g) + (c>=leftCols ? aisle : 0);
+  let out = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Plano de asientos ${m.label}">
+    <rect x="2" y="2" width="${w-4}" height="${h-4}" rx="18" fill="none" stroke="var(--seat2)" stroke-width="2"/>
+    <rect x="${x(0)}" y="12" width="${s}" height="${s}" rx="5" fill="var(--accent)"/>
+    <text x="${x(0)+s/2}" y="${12+s/2+4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">C</text>
+    <text x="${w-pad}" y="${12+s/2+4}" text-anchor="end" font-size="9" fill="var(--muted)">puerta</text>`;
+  let k = 1;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols && k<=n;c++){
+      const cx = x(c);
+      const cy = front + r*(s+g);
+      const isMic = k===1 && mic;
+      out += `<rect x="${cx}" y="${cy}" width="${s}" height="${s}" rx="5" fill="${isMic?'var(--warn)':'var(--seat)'}"/>
+        <text x="${cx+s/2}" y="${cy+s/2+4}" text-anchor="middle" font-size="10" fill="var(--card)" font-weight="600">${k}</text>`;
+      if(isMic) out += `<text x="${cx-3}" y="${cy+4}" text-anchor="end" font-size="11">🎤</text>`;
+      k++;
+    }
+  }
+  out += `<rect x="${pad}" y="${h-30}" width="${w-2*pad}" height="18" rx="4" fill="none" stroke="var(--seat2)" stroke-dasharray="4 3"/>
+    <text x="${w/2}" y="${h-17}" text-anchor="middle" font-size="9" fill="var(--muted)">maletero</text></svg>`;
+  return out;
+}
+
+function lines(s){
+  return GROUPS.map(g => ({title:g.title, items:g.items.map(i => ({t:i.t, type:i.type, v:s.opts[i.id]}))}));
+}
+function pending(s){ return ALL.filter(i => s.opts[i.id]==='consultar').map(i => i.t); }
+function title(s){ const m=MODELS.find(x=>x.id===s.model); return `Mercedes-Benz Sprinter ${m.label} plazas`; }
+
+function renderSummary(){
+  $('sumTitle').textContent = title(state);
+  $('plan').innerHTML = planSvg(model(), state.opts.micro==='si');
+  $('sumBody').innerHTML = lines(state).map(g => `<h3>${g.title}</h3><ul>${g.items.map(i =>
+    i.type==='tri' ? `<li><span class="tag ${i.v}">${TRI[i.v]}</span>${esc(i.t)}</li>`
+                   : `<li><span class="tag si">${esc(i.v)}</span>${esc(i.t)}</li>`).join('')}</ul>`).join('');
+  const p = pending(state);
+  $('pend').innerHTML = p.length ? `<div class="alert"><b>${p.length} punto(s) a consultar:</b> ${p.map(esc).join(' · ')}</div>` : '';
+}
+
+function textSummary(s){
+  let t = `*${title(s)}*\n`;
+  if(s.ref) t += `Ref. ${s.ref}\n`;
+  if(s.cliente) t += `Cliente: ${s.cliente}\n`;
+  lines(s).forEach(g => {
+    t += `\n${g.title.toUpperCase()}\n`;
+    g.items.forEach(i => t += i.type==='tri' ? `- ${i.t}: ${TRI[i.v]}\n` : `- ${i.t}: ${i.v}\n`);
+  });
+  if(s.precio) t += `\nPrecio: ${Number(s.precio).toLocaleString('es-ES')} €\n`;
+  if(s.obs) t += `\nObservaciones: ${s.obs}\n`;
+  return t;
+}
+
+function renderPrint(s){
+  const date = new Date(s.fecha || Date.now()).toLocaleDateString('es-ES');
+  const m = MODELS.find(x=>x.id===s.model);
+  $('print').innerHTML = `
+    <h1>Hoja de pedido — ${esc(title(s))}</h1>
+    <div>Ref. ${esc(s.ref || 'borrador')} · ${date}</div>
+    <h3>Cliente</h3>
+    <div>${esc(s.cliente||'—')} · ${esc(s.telefono||'')} · ${esc(s.email||'')}</div>
+    <div style="display:flex;gap:20px;align-items:flex-start">
+      <div style="flex:1">${lines(s).map(g=>`<h3>${g.title}</h3><table>${g.items.map(i=>`<tr><td>${esc(i.t)}</td><td style="width:140px"><b>${esc(i.type==='tri'?TRI[i.v]:i.v)}</b></td></tr>`).join('')}</table>`).join('')}</div>
+      <div style="width:170px" class="plan">${planSvg(m, s.opts.micro==='si')}</div>
+    </div>
+    ${pending(s).length?`<h3>Pendiente de consultar</h3><div>${pending(s).map(esc).join(' · ')}</div>`:''}
+    ${s.precio?`<h3>Precio</h3><div>${Number(s.precio).toLocaleString('es-ES')} €</div>`:''}
+    ${s.obs?`<h3>Observaciones</h3><div>${esc(s.obs)}</div>`:''}
+    <div style="margin-top:30px;display:flex;justify-content:space-between"><div>Firma cliente: ____________________</div><div>Firma vendedor: ____________________</div></div>`;
+}
+
+function renderList(){
+  const list = load();
+  $('count').textContent = list.length ? `(${list.length})` : '';
+  $('rows').innerHTML = list.length ? list.slice().reverse().map(p => `
+    <tr>
+      <td><b>${esc(p.ref)}</b></td>
+      <td>${new Date(p.fecha).toLocaleDateString('es-ES')}</td>
+      <td>${esc(p.cliente||'—')}<div style="color:var(--muted);font-size:12px">${esc(p.telefono||'')}</div></td>
+      <td>Sprinter ${MODELS.find(m=>m.id===p.model).label}<div style="color:var(--muted);font-size:12px">${esc(p.opts.color)}</div></td>
+      <td>${pending(p).length ? `<span class="tag consultar">${pending(p).length}</span> <span style="font-size:12px;color:var(--muted)">${pending(p).map(esc).join(', ')}</span>` : '<span class="tag si">Nada</span>'}</td>
+      <td>${p.precio?Number(p.precio).toLocaleString('es-ES')+' €':'—'}</td>
+      <td style="white-space:nowrap"><button class="btn" data-open="${esc(p.ref)}">Abrir</button> <button class="btn danger" data-del="${esc(p.ref)}">Borrar</button></td>
+    </tr>`).join('') : `<tr><td colspan="7" class="empty">Aún no hay pedidos guardados.</td></tr>`;
+}
+
+function syncForm(){ ['cliente','telefono','email','precio','obs'].forEach(k => $(k).value = state[k] || ''); }
+function renderAll(){ renderModels(); renderGroups(); renderSummary(); }
+function show(v){
+  $('viewConf').classList.toggle('hidden', v!=='conf'); $('viewList').classList.toggle('hidden', v!=='list');
+  $('tabConf').classList.toggle('active', v==='conf'); $('tabList').classList.toggle('active', v==='list');
+  if(v==='list') renderList();
+}
+
+// Eventos
+$('models').addEventListener('click', e => { const b=e.target.closest('[data-m]'); if(!b) return; state.model=+b.dataset.m; renderModels(); renderSummary(); });
+$('groups').addEventListener('click', e => {
+  const b=e.target.closest('.seg button'); if(!b) return;
+  state.opts[b.parentElement.dataset.o] = b.dataset.v;
+  b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x===b));
+  renderSummary();
+});
+$('groups').addEventListener('change', e => { if(e.target.dataset.s){ state.opts[e.target.dataset.s]=e.target.value; renderSummary(); } });
+['cliente','telefono','email','precio','obs'].forEach(k => $(k).addEventListener('input', e => state[k]=e.target.value));
+
+$('save').onclick = () => {
+  const list = load();
+  if(!state.ref){
+    const y = new Date().getFullYear();
+    const nums = list.filter(p=>p.ref.startsWith(`TB-${y}-`)).map(p=>+p.ref.split('-')[2]);
+    state.ref = `TB-${y}-${String((nums.length?Math.max(...nums):0)+1).padStart(3,'0')}`;
+    state.fecha = Date.now();
+  }
+  const i = list.findIndex(p=>p.ref===state.ref);
+  const copy = JSON.parse(JSON.stringify(state));
+  if(i>=0) list[i]=copy; else list.push(copy);
+  toast(store(list) ? `Pedido ${state.ref} guardado` : 'No se pudo guardar en este navegador');
+  renderList();
+};
+$('printBtn').onclick = () => { renderPrint(state); window.print(); };
+$('wa').onclick = () => {
+  const tel = (state.telefono||'').replace(/\D/g,'');
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(textSummary(state))}`, '_blank');
+};
+$('mail').onclick = () => {
+  location.href = `mailto:${encodeURIComponent(state.email||'')}?subject=${encodeURIComponent(title(state)+(state.ref?' — '+state.ref:''))}&body=${encodeURIComponent(textSummary(state).replace(/\*/g,''))}`;
+};
+$('reset').onclick = () => { state=fresh(); syncForm(); renderAll(); toast('Nueva configuración'); };
+$('tabConf').onclick = () => show('conf');
+$('tabList').onclick = () => show('list');
+$('rows').addEventListener('click', e => {
+  const o=e.target.dataset.open, d=e.target.dataset.del;
+  if(o){ state = JSON.parse(JSON.stringify(load().find(p=>p.ref===o))); ALL.forEach(i=>{ if(!(i.id in state.opts)) state.opts[i.id]=i.def; }); syncForm(); renderAll(); show('conf'); }
+  if(d && confirm(`¿Borrar el pedido ${d}?`)){ store(load().filter(p=>p.ref!==d)); renderList(); }
+});
+$('exportBtn').onclick = () => {
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(load(),null,2)],{type:'application/json'}));
+  a.download=`pedidos-torresbus-${new Date().toISOString().slice(0,10)}.json`; a.click();
+};
+$('importFile').onchange = async e => {
+  try{
+    const inc = JSON.parse(await e.target.files[0].text());
+    const list = load(); inc.forEach(p => { if(p.ref && !list.some(x=>x.ref===p.ref)) list.push(p); });
+    store(list); renderList(); toast('Pedidos importados');
+  }catch(err){ toast('Archivo no válido'); }
+  e.target.value='';
+};
+
+renderAll(); renderList();
+</script>
+</body>
+</html>
