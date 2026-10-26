@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torresbus Configurador Sprinter</title>
-<meta name="description" content="Configurador y hojas de pedido de minibuses Mercedes-Benz Sprinter de 16, 20 y 30 plazas más conductor.">
+<title>Torresbus Presupuestos Sprinter</title>
+<meta name="description" content="Presupuestos de minibuses Mercedes-Benz Sprinter de 16, 20 y 30 plazas más conductor.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -34,21 +34,23 @@ header{background:var(--card);border-bottom:1px solid var(--line);position:stick
 .bar{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{font-weight:700;font-size:18px;letter-spacing:-.01em}
 .brand small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
-nav{margin-left:auto;display:flex;gap:6px}
+nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
 nav button{border:1px solid var(--line);background:transparent;color:var(--text);padding:8px 12px;border-radius:8px;font:inherit;font-weight:500;cursor:pointer}
 nav button.active{background:var(--accent);border-color:var(--accent);color:#fff}
 main{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
 @media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px}
 h2{font-size:16px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 h2 .n{background:var(--accent-soft);color:var(--accent);border-radius:50%;width:24px;height:24px;display:inline-grid;place-items:center;font-size:13px}
+.sub{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px}
 .models{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:560px){.models{grid-template-columns:minmax(0,1fr)}}
 .model{border:2px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;background:transparent;color:inherit;text-align:left;font:inherit}
 .model.sel{border-color:var(--accent);background:var(--accent-soft)}
 .model b{font-size:26px;display:block;line-height:1.1}
 .model span{color:var(--muted);font-size:13px}
+.model .p{display:block;margin-top:6px;color:var(--text);font-weight:600}
 .opts{display:grid;gap:8px}
 .opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
 .opt .t{font-weight:500}
@@ -61,14 +63,14 @@ h2 .n{background:var(--accent-soft);color:var(--accent);border-radius:50%;width:
 .seg button.on[data-v="consultar"]{background:var(--warn-soft);color:var(--warn);font-weight:600}
 @media (max-width:560px){.opt{grid-template-columns:minmax(0,1fr)}}
 label.f{display:block;font-size:13px;color:var(--muted);margin-bottom:10px}
-label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:4px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+input,select,textarea{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:4px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:560px){.row2,.row3{grid-template-columns:1fr}}
 .sticky{position:sticky;top:76px}
-.sum h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 6px}
 .sum ul{list-style:none;display:grid;gap:4px;font-size:14px}
-.sum li{display:flex;gap:8px}
-.tag{font-size:11px;font-weight:600;padding:2px 6px;border-radius:5px;flex:none;align-self:flex-start;margin-top:2px}
+.tag{font-size:11px;font-weight:600;padding:2px 6px;border-radius:5px;white-space:nowrap}
 .tag.si{background:var(--ok-soft);color:var(--ok)}
 .tag.no{background:var(--no-soft);color:var(--no)}
 .tag.consultar{background:var(--warn-soft);color:var(--warn)}
@@ -77,81 +79,112 @@ label.f input,label.f select,label.f textarea{display:block;width:100%;margin-to
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.danger{color:var(--no)}
 .plan{background:var(--bg);border-radius:10px;padding:10px;margin-top:6px}
-.plan svg{width:100%;height:auto;display:block}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.plan svg{width:100%;max-height:260px;height:auto;display:block}
 .alert{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+.info{background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+td.r,th.r{text-align:right;white-space:nowrap}
+.tot td{border:0;padding:4px 8px}
+.tot .big td{font-size:18px;font-weight:700;border-top:2px solid var(--text);padding-top:8px}
 .tablewrap{overflow-x:auto}
 .empty{color:var(--muted);text-align:center;padding:30px}
 .hidden{display:none!important}
+.money{width:120px;text-align:right}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:500;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
 .toast.show{opacity:1}
 #print{display:none}
 @media print{
-  body{background:#fff;color:#000;font-size:12px}
+  @page{margin:12mm}
+  body{background:#fff;color:#000;font-size:11.5px}
   header,main,.toast{display:none!important}
-  #print{display:block;padding:10mm}
-  #print h1{font-size:20px;margin-bottom:4px}
-  #print h3{font-size:13px;margin:12px 0 4px;border-bottom:1px solid #999;padding-bottom:2px}
-  #print table td,#print table th{padding:4px 6px;border-bottom:1px solid #ddd;color:#000}
-  #print .plan{background:#fff}
+  #print{display:block}
+  #print h1{font-size:22px;margin:0}
+  #print h3{font-size:12px;margin:14px 0 4px;text-transform:uppercase;letter-spacing:.05em}
+  #print th,#print td{padding:4px 6px;border-bottom:1px solid #ddd;color:#000}
+  #print table{table-layout:fixed}
+  #print .tot td{border:0}
+  #print .tot .big td{border-top:2px solid #000}
+  #print .plan{background:#fff;padding:0}
+  #print .tag{border:1px solid #999;background:#fff;color:#000}
 }
 </style>
 </head>
 <body>
 <header>
   <div class="bar">
-    <div class="brand">Torresbus · Sprinter<small>Configurador de minibuses Mercedes-Benz Sprinter</small></div>
+    <div class="brand" id="brand">Torresbus · Presupuestos<small>Minibuses Mercedes-Benz Sprinter</small></div>
     <nav>
-      <button id="tabConf" class="active">Configurar</button>
-      <button id="tabList">Pedidos <span id="count"></span></button>
+      <button data-tab="conf" class="active">Nuevo presupuesto</button>
+      <button data-tab="list">Presupuestos <span id="count"></span></button>
+      <button data-tab="tar">Tarifas</button>
     </nav>
   </div>
 </header>
 
 <main>
+  <!-- PRESUPUESTO -->
   <section id="viewConf">
+    <div class="info hidden" id="noPrices">Aún no hay precios. Ve a <b>Tarifas</b> e introduce el precio base de cada modelo y el de los extras.</div>
     <div class="grid">
       <div>
         <div class="card">
-          <h2><span class="n">1</span>Modelo</h2>
+          <h2><span class="n">1</span>Cliente</h2>
+          <div class="row2">
+            <label class="f">Cliente / empresa<input id="cliente" autocomplete="organization"></label>
+            <label class="f">CIF / NIF<input id="cif"></label>
+            <label class="f">Teléfono<input id="telefono" type="tel" autocomplete="tel"></label>
+            <label class="f">Email<input id="email" type="email" autocomplete="email"></label>
+          </div>
+          <label class="f">Dirección<input id="direccion" autocomplete="street-address"></label>
+        </div>
+
+        <div class="card">
+          <h2><span class="n">2</span>Modelo</h2>
           <div class="models" id="models"></div>
         </div>
 
         <div class="card">
-          <h2><span class="n">2</span>Equipamiento</h2>
+          <h2><span class="n">3</span>Equipamiento</h2>
           <div id="groups"></div>
         </div>
 
         <div class="card">
-          <h2><span class="n">3</span>Cliente y pedido</h2>
-          <div class="row2">
-            <label class="f">Cliente / empresa<input id="cliente" autocomplete="organization"></label>
-            <label class="f">Teléfono<input id="telefono" type="tel" autocomplete="tel"></label>
-            <label class="f">Email<input id="email" type="email" autocomplete="email"></label>
-            <label class="f">Precio (€, opcional)<input id="precio" type="number" min="0" step="100"></label>
+          <h2><span class="n">4</span>Otros conceptos</h2>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Transporte, matriculación, rotulación, etc.</p>
+          <div id="extras"></div>
+          <button class="btn" id="addExtra">+ Añadir concepto</button>
+        </div>
+
+        <div class="card">
+          <h2><span class="n">5</span>Condiciones</h2>
+          <div class="row3">
+            <label class="f">Descuento (€)<input id="descuento" type="number" min="0" step="100"></label>
+            <label class="f">IVA (%)<input id="iva" type="number" min="0" step="1"></label>
+            <label class="f">Validez (días)<input id="validez" type="number" min="1" step="1"></label>
           </div>
-          <label class="f">Observaciones<textarea id="obs" rows="3" placeholder="Plazos, matriculación, financiación…"></textarea></label>
+          <div class="row2">
+            <label class="f">Plazo de entrega<input id="entrega" placeholder="p. ej. 16 semanas desde pedido"></label>
+            <label class="f">Forma de pago<input id="pago"></label>
+          </div>
+          <label class="f">Observaciones<textarea id="obs" rows="3"></textarea></label>
         </div>
       </div>
 
       <aside class="sticky">
         <div class="card sum">
-          <h2>Resumen</h2>
+          <h2>Resumen <span id="sumRef" style="margin-left:auto;color:var(--muted);font-weight:500;font-size:13px"></span></h2>
           <div id="sumTitle" style="font-weight:600;font-size:17px"></div>
           <div class="plan" id="plan"></div>
-          <div class="legend">
-            <span>■ Conductor</span><span>■ Pasajero</span><span>🎤 Micro pilar asiento 1</span>
-          </div>
-          <div id="sumBody"></div>
+          <table class="tot" style="margin-top:12px" id="totals"></table>
           <div id="pend"></div>
           <div class="btns">
-            <button class="btn primary" id="save">Guardar pedido</button>
+            <button class="btn primary" id="save">Guardar</button>
             <button class="btn" id="printBtn">Imprimir / PDF</button>
             <button class="btn" id="wa">WhatsApp</button>
             <button class="btn" id="mail">Email</button>
+            <button class="btn" id="dup">Duplicar</button>
             <button class="btn" id="reset">Nuevo</button>
           </div>
         </div>
@@ -159,18 +192,56 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     </div>
   </section>
 
+  <!-- LISTA -->
   <section id="viewList" class="hidden">
     <div class="card">
-      <h2>Pedidos guardados</h2>
-      <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Se guardan en este navegador. Exporta una copia para no perderlos.</p>
-      <div class="btns" style="margin:0 0 12px">
-        <button class="btn" id="exportBtn">Exportar (.json)</button>
-        <label class="btn">Importar<input type="file" id="importFile" accept=".json" hidden></label>
+      <h2>Presupuestos guardados</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Se guardan en este navegador. Exporta una copia de seguridad de vez en cuando.</p>
+      <div class="row2" style="margin-bottom:6px">
+        <input id="search" placeholder="Buscar cliente o referencia…">
+        <select id="filter"><option value="">Todos los estados</option></select>
       </div>
       <div class="tablewrap"><table>
-        <thead><tr><th>Ref.</th><th>Fecha</th><th>Cliente</th><th>Modelo</th><th>Pendiente consultar</th><th>Precio</th><th></th></tr></thead>
+        <thead><tr><th>Ref.</th><th>Fecha</th><th>Cliente</th><th>Modelo</th><th class="r">Total</th><th>Estado</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table></div>
+      <div class="btns">
+        <button class="btn" id="exportBtn">Exportar copia (.json)</button>
+        <label class="btn">Importar copia<input type="file" id="importFile" accept=".json" hidden></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- TARIFAS -->
+  <section id="viewTar" class="hidden">
+    <div class="info">Los precios son <b>sin IVA</b>. Se guardan al escribir. Cada presupuesto guardado conserva los precios con los que se hizo.</div>
+    <div class="card">
+      <h2>Datos de tu empresa</h2>
+      <div class="row2">
+        <label class="f">Nombre<input data-emp="nombre"></label>
+        <label class="f">CIF<input data-emp="cif"></label>
+        <label class="f">Teléfono<input data-emp="telefono"></label>
+        <label class="f">Email<input data-emp="email"></label>
+      </div>
+      <label class="f">Dirección<input data-emp="direccion"></label>
+    </div>
+    <div class="card">
+      <h2>Precio base por modelo</h2>
+      <div class="opts" id="tarModels"></div>
+    </div>
+    <div class="card">
+      <h2>Precio de extras</h2>
+      <p style="color:var(--muted);font-size:13px">Se suma cuando el extra está en <b>Sí</b>. Déjalo a 0 si va incluido en el precio base.</p>
+      <div id="tarOpts"></div>
+    </div>
+    <div class="card">
+      <h2>Valores por defecto</h2>
+      <div class="row3">
+        <label class="f">IVA (%)<input data-def="iva" type="number" min="0"></label>
+        <label class="f">Validez (días)<input data-def="validez" type="number" min="1"></label>
+        <label class="f">Forma de pago<input data-def="pago"></label>
+      </div>
+      <label class="f">Condiciones generales (pie del presupuesto)<textarea data-def="condiciones" rows="3"></textarea></label>
     </div>
   </section>
 </main>
@@ -219,46 +290,106 @@ const GROUPS = [
 ];
 const ALL = GROUPS.flatMap(g => g.items);
 const TRI = {si:'Sí', no:'No', consultar:'Consultar'};
-const KEY = 'torresbus_pedidos_v1';
+const ESTADOS = ['Borrador','Enviado','Aceptado','Rechazado'];
+const KEY = 'torresbus_presupuestos_v1', KEY_T = 'torresbus_tarifas_v1';
 const $ = id => document.getElementById(id);
+// Formato manual: es-ES no agrupa miles en cifras de 4 dígitos (7100 → 7.100).
+const eur = n => { const [i,d] = Math.abs(n).toFixed(2).split('.'); return (n<0?'−':'') + i.replace(/\B(?=(\d{3})+(?!\d))/g,'.') + ',' + d + ' €'; };
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
 
+function readJSON(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } }
+function writeJSON(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+const clone = o => JSON.parse(JSON.stringify(o));
+
+// ---------- Tarifas ----------
+function defaultTarifa(){
+  const t = {empresa:{nombre:'Torresbus',cif:'',telefono:'',email:'',direccion:''},
+    base:{16:0,20:0,30:0}, extras:{}, sel:{},
+    iva:21, validez:30, pago:'', condiciones:'Precios sin IVA salvo indicación. Los puntos marcados como "a consultar" no están incluidos en el total y se presupuestarán aparte.'};
+  ALL.forEach(i => { if(i.type==='tri') t.extras[i.id]=0; else { t.sel[i.id]={}; i.options.forEach(o=>t.sel[i.id][o]=0); } });
+  return t;
+}
+let tarifa = Object.assign(defaultTarifa(), readJSON(KEY_T, {}));
+const saveTarifa = () => writeJSON(KEY_T, tarifa);
+
+// ---------- Presupuesto ----------
 let state = fresh();
 function fresh(){
-  const s = {model:16, opts:{}, cliente:'', telefono:'', email:'', precio:'', obs:'', ref:null};
+  const s = {model:16, opts:{}, extras:[], cliente:'', cif:'', telefono:'', email:'', direccion:'',
+    descuento:'', iva:tarifa.iva, validez:tarifa.validez, entrega:'', pago:tarifa.pago, obs:'',
+    estado:'Borrador', ref:null, fecha:null, tarifa:null};
   ALL.forEach(i => s.opts[i.id] = i.def);
   return s;
 }
-function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } }
-function store(list){ try{ localStorage.setItem(KEY, JSON.stringify(list)); return true; }catch(e){ return false; } }
-function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
-const model = () => MODELS.find(m => m.id === state.model);
+// Un presupuesto guardado usa sus propios precios; uno nuevo, la tarifa actual.
+const tar = s => s.tarifa || tarifa;
+const model = s => MODELS.find(m => m.id === s.model);
+const title = s => `Mercedes-Benz Sprinter ${model(s).label} plazas`;
+const pending = s => ALL.filter(i => s.opts[i.id]==='consultar').map(i => i.t);
 
+function itemPrice(s, i){
+  const T = tar(s), v = s.opts[i.id];
+  if(i.type==='sel') return num(T.sel[i.id]?.[v]);
+  return v==='si' ? num(T.extras[i.id]) : 0;
+}
+function calc(s){
+  const T = tar(s);
+  const base = num(T.base[s.model]);
+  const equip = ALL.reduce((a,i) => a + itemPrice(s,i), 0);
+  const otros = s.extras.reduce((a,e) => a + num(e.importe), 0);
+  const subtotal = base + equip + otros;
+  const descuento = Math.min(num(s.descuento), subtotal);
+  const baseImp = subtotal - descuento;
+  const iva = baseImp * num(s.iva) / 100;
+  return {base, equip, otros, subtotal, descuento, baseImp, iva, total: baseImp + iva};
+}
+function priceLabel(s, i){
+  const v = s.opts[i.id];
+  if(i.type==='tri' && v==='no') return '—';
+  if(v==='consultar') return 'A consultar';
+  const p = itemPrice(s,i);
+  return p ? eur(p) : 'Incluido';
+}
+
+// ---------- Render presupuesto ----------
 function renderModels(){
+  const T = tar(state);
   $('models').innerHTML = MODELS.map(m => `
     <button class="model ${m.id===state.model?'sel':''}" data-m="${m.id}">
       <b>${m.label}</b><span>Mercedes-Benz Sprinter<br>${m.desc}</span>
+      <span class="p">${num(T.base[m.id]) ? eur(T.base[m.id]) : 'Sin precio'}</span>
     </button>`).join('');
 }
-
 function renderGroups(){
-  $('groups').innerHTML = GROUPS.map(g => `
-    <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px">${g.title}</h3>
+  $('groups').innerHTML = GROUPS.map(g => `<div class="sub">${g.title}</div>
     <div class="opts">${g.items.map(optHtml).join('')}</div>`).join('');
 }
 function optHtml(i){
   const v = state.opts[i.id];
   const ctl = i.type === 'tri'
     ? `<div class="seg" data-o="${i.id}">${Object.keys(TRI).map(k=>`<button data-v="${k}" class="${v===k?'on':''}">${TRI[k]}</button>`).join('')}</div>`
-    : `<select data-s="${i.id}" style="padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit">${i.options.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
-  return `<div class="opt"><div><div class="t">${i.t}</div>${i.d?`<div class="d">${i.d}</div>`:''}</div>${ctl}</div>`;
+    : `<select data-s="${i.id}">${i.options.map(o=>`<option ${o===v?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  return `<div class="opt"><div><div class="t">${i.t}</div><div class="d" data-pl="${i.id}">${i.d?i.d+' · ':''}${priceLabel(state,i)}</div></div>${ctl}</div>`;
+}
+function refreshPriceLabels(){
+  ALL.forEach(i => { const el = document.querySelector(`[data-pl="${i.id}"]`); if(el) el.textContent = (i.d?i.d+' · ':'') + priceLabel(state,i); });
+}
+function renderExtras(){
+  $('extras').innerHTML = state.extras.map((e,k) => `
+    <div class="opt" style="margin-bottom:8px;grid-template-columns:minmax(0,1fr) auto auto">
+      <input data-ex="${k}" data-f="concepto" value="${esc(e.concepto)}" placeholder="Concepto">
+      <input class="money" data-ex="${k}" data-f="importe" type="number" step="10" value="${esc(e.importe)}" placeholder="€">
+      <button class="btn danger" data-rm="${k}" aria-label="Quitar">✕</button>
+    </div>`).join('');
 }
 
 // Plano en planta: conductor delante a la izquierda, asiento 1 con micro.
 function planSvg(m, mic){
   const cols = m.cols, n = m.id, rows = Math.ceil(n/cols);
   const s=26, g=6, aisle=18, pad=12, front=46;
-  const leftCols = cols===4?2:1, rightCols = cols-leftCols;
+  const leftCols = cols===4?2:1;
   const w = pad*2 + cols*s + (cols-1)*g + aisle;
   const h = front + rows*(s+g) + 40;
   const x = c => pad + c*(s+g) + (c>=leftCols ? aisle : 0);
@@ -270,146 +401,214 @@ function planSvg(m, mic){
   let k = 1;
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols && k<=n;c++){
-      const cx = x(c);
-      const cy = front + r*(s+g);
-      const isMic = k===1 && mic;
+      const cx = x(c), cy = front + r*(s+g), isMic = k===1 && mic;
       out += `<rect x="${cx}" y="${cy}" width="${s}" height="${s}" rx="5" fill="${isMic?'var(--warn)':'var(--seat)'}"/>
         <text x="${cx+s/2}" y="${cy+s/2+4}" text-anchor="middle" font-size="10" fill="var(--card)" font-weight="600">${k}</text>`;
       if(isMic) out += `<text x="${cx-3}" y="${cy+4}" text-anchor="end" font-size="11">🎤</text>`;
       k++;
     }
   }
-  out += `<rect x="${pad}" y="${h-30}" width="${w-2*pad}" height="18" rx="4" fill="none" stroke="var(--seat2)" stroke-dasharray="4 3"/>
+  return out + `<rect x="${pad}" y="${h-30}" width="${w-2*pad}" height="18" rx="4" fill="none" stroke="var(--seat2)" stroke-dasharray="4 3"/>
     <text x="${w/2}" y="${h-17}" text-anchor="middle" font-size="9" fill="var(--muted)">maletero</text></svg>`;
-  return out;
 }
 
-function lines(s){
-  return GROUPS.map(g => ({title:g.title, items:g.items.map(i => ({t:i.t, type:i.type, v:s.opts[i.id]}))}));
+function totalsHtml(s){
+  const c = calc(s);
+  return `
+    <tr><td>Vehículo base</td><td class="r">${eur(c.base)}</td></tr>
+    <tr><td>Equipamiento</td><td class="r">${eur(c.equip)}</td></tr>
+    ${c.otros?`<tr><td>Otros conceptos</td><td class="r">${eur(c.otros)}</td></tr>`:''}
+    ${c.descuento?`<tr><td>Descuento</td><td class="r">−${eur(c.descuento)}</td></tr>`:''}
+    <tr><td>Base imponible</td><td class="r">${eur(c.baseImp)}</td></tr>
+    <tr><td>IVA ${num(s.iva)}%</td><td class="r">${eur(c.iva)}</td></tr>
+    <tr class="big"><td>TOTAL</td><td class="r">${eur(c.total)}</td></tr>`;
 }
-function pending(s){ return ALL.filter(i => s.opts[i.id]==='consultar').map(i => i.t); }
-function title(s){ const m=MODELS.find(x=>x.id===s.model); return `Mercedes-Benz Sprinter ${m.label} plazas`; }
-
 function renderSummary(){
   $('sumTitle').textContent = title(state);
-  $('plan').innerHTML = planSvg(model(), state.opts.micro==='si');
-  $('sumBody').innerHTML = lines(state).map(g => `<h3>${g.title}</h3><ul>${g.items.map(i =>
-    i.type==='tri' ? `<li><span class="tag ${i.v}">${TRI[i.v]}</span>${esc(i.t)}</li>`
-                   : `<li><span class="tag si">${esc(i.v)}</span>${esc(i.t)}</li>`).join('')}</ul>`).join('');
+  $('sumRef').textContent = state.ref ? `${state.ref} · ${state.estado}` : 'Sin guardar';
+  $('plan').innerHTML = planSvg(model(state), state.opts.micro==='si');
+  $('totals').innerHTML = totalsHtml(state);
   const p = pending(state);
-  $('pend').innerHTML = p.length ? `<div class="alert"><b>${p.length} punto(s) a consultar:</b> ${p.map(esc).join(' · ')}</div>` : '';
+  $('pend').innerHTML = p.length ? `<div class="alert"><b>${p.length} punto(s) a consultar, no incluidos en el total:</b> ${p.map(esc).join(' · ')}</div>` : '';
+  $('noPrices').classList.toggle('hidden', MODELS.some(m => num(tarifa.base[m.id])));
 }
+const FIELDS = ['cliente','cif','telefono','email','direccion','descuento','iva','validez','entrega','pago','obs'];
+function syncForm(){ FIELDS.forEach(k => $(k).value = state[k] ?? ''); }
+function renderConf(){ renderModels(); renderGroups(); renderExtras(); renderSummary(); }
 
+// ---------- Texto y PDF ----------
+function fmtDate(t){ return new Date(t).toLocaleDateString('es-ES'); }
 function textSummary(s){
-  let t = `*${title(s)}*\n`;
-  if(s.ref) t += `Ref. ${s.ref}\n`;
+  const c = calc(s), T = tar(s);
+  let t = `*Presupuesto ${s.ref || ''} — ${T.empresa.nombre}*\n${title(s)}\n`;
   if(s.cliente) t += `Cliente: ${s.cliente}\n`;
-  lines(s).forEach(g => {
+  GROUPS.forEach(g => {
     t += `\n${g.title.toUpperCase()}\n`;
-    g.items.forEach(i => t += i.type==='tri' ? `- ${i.t}: ${TRI[i.v]}\n` : `- ${i.t}: ${i.v}\n`);
+    g.items.forEach(i => { if(!(i.type==='tri' && s.opts[i.id]==='no')) t += `- ${i.t}${i.type==='sel'?': '+s.opts[i.id]:''} (${priceLabel(s,i)})\n`; });
   });
-  if(s.precio) t += `\nPrecio: ${Number(s.precio).toLocaleString('es-ES')} €\n`;
-  if(s.obs) t += `\nObservaciones: ${s.obs}\n`;
+  const no = ALL.filter(i => i.type==='tri' && s.opts[i.id]==='no').map(i => i.t);
+  if(no.length) t += `\nSin: ${no.join(', ')}\n`;
+  s.extras.forEach(e => t += `- ${e.concepto}: ${eur(num(e.importe))}\n`);
+  t += `\nBase imponible: ${eur(c.baseImp)}\nIVA ${num(s.iva)}%: ${eur(c.iva)}\n*TOTAL: ${eur(c.total)}*\n`;
+  const p = pending(s); if(p.length) t += `\nA consultar (no incluido): ${p.join(', ')}\n`;
+  if(s.entrega) t += `Entrega: ${s.entrega}\n`;
+  if(s.pago) t += `Forma de pago: ${s.pago}\n`;
+  t += `Validez: ${s.validez} días\n`;
+  if(s.obs) t += `\n${s.obs}\n`;
   return t;
 }
-
 function renderPrint(s){
-  const date = new Date(s.fecha || Date.now()).toLocaleDateString('es-ES');
-  const m = MODELS.find(x=>x.id===s.model);
+  const T = tar(s), E = T.empresa, c = calc(s);
+  const fecha = s.fecha || Date.now(), vence = fecha + num(s.validez)*864e5;
+  const row = i => `<tr><td>${esc(i.t)}${i.type==='sel'?`: <b>${esc(s.opts[i.id])}</b>`:''}</td>
+    <td style="width:90px">${i.type==='tri'?`<span class="tag ${s.opts[i.id]}">${TRI[s.opts[i.id]]}</span>`:''}</td><td class="r" style="width:110px">${priceLabel(s,i)}</td></tr>`;
   $('print').innerHTML = `
-    <h1>Hoja de pedido — ${esc(title(s))}</h1>
-    <div>Ref. ${esc(s.ref || 'borrador')} · ${date}</div>
-    <h3>Cliente</h3>
-    <div>${esc(s.cliente||'—')} · ${esc(s.telefono||'')} · ${esc(s.email||'')}</div>
-    <div style="display:flex;gap:20px;align-items:flex-start">
-      <div style="flex:1">${lines(s).map(g=>`<h3>${g.title}</h3><table>${g.items.map(i=>`<tr><td>${esc(i.t)}</td><td style="width:140px"><b>${esc(i.type==='tri'?TRI[i.v]:i.v)}</b></td></tr>`).join('')}</table>`).join('')}</div>
-      <div style="width:170px" class="plan">${planSvg(m, s.opts.micro==='si')}</div>
+    <div style="display:flex;justify-content:space-between;gap:20px;align-items:flex-start">
+      <div><h1>${esc(E.nombre)}</h1><div>${[E.cif,E.direccion,E.telefono,E.email].filter(Boolean).map(esc).join('<br>')}</div></div>
+      <div style="text-align:right"><h1>PRESUPUESTO</h1><div>Nº <b>${esc(s.ref || 'BORRADOR')}</b><br>Fecha: ${fmtDate(fecha)}<br>Válido hasta: ${fmtDate(vence)}</div></div>
     </div>
-    ${pending(s).length?`<h3>Pendiente de consultar</h3><div>${pending(s).map(esc).join(' · ')}</div>`:''}
-    ${s.precio?`<h3>Precio</h3><div>${Number(s.precio).toLocaleString('es-ES')} €</div>`:''}
-    ${s.obs?`<h3>Observaciones</h3><div>${esc(s.obs)}</div>`:''}
-    <div style="margin-top:30px;display:flex;justify-content:space-between"><div>Firma cliente: ____________________</div><div>Firma vendedor: ____________________</div></div>`;
+    <h3>Cliente</h3>
+    <div>${[s.cliente,s.cif,s.direccion,s.telefono,s.email].filter(Boolean).map(esc).join(' · ') || '—'}</div>
+    <h3>Vehículo</h3>
+    <div style="display:flex;gap:20px;align-items:flex-start">
+      <div style="flex:1">
+        <table><tr><td><b>${esc(title(s))}</b></td><td style="width:90px"></td><td class="r" style="width:110px"><b>${eur(c.base)}</b></td></tr></table>
+        ${GROUPS.map(g=>`<h3>${g.title}</h3><table>${g.items.map(row).join('')}</table>`).join('')}
+        ${s.extras.length?`<h3>Otros conceptos</h3><table>${s.extras.map(e=>`<tr><td>${esc(e.concepto)}</td><td class="r">${eur(num(e.importe))}</td></tr>`).join('')}</table>`:''}
+      </div>
+      <div style="width:150px" class="plan">${planSvg(model(s), s.opts.micro==='si')}</div>
+    </div>
+    <table class="tot" style="width:300px;margin:14px 0 0 auto">${totalsHtml(s)}</table>
+    ${pending(s).length?`<h3>A consultar (no incluido en el total)</h3><div>${pending(s).map(esc).join(' · ')}</div>`:''}
+    <h3>Condiciones</h3>
+    <div>${s.entrega?`Plazo de entrega: ${esc(s.entrega)}<br>`:''}${s.pago?`Forma de pago: ${esc(s.pago)}<br>`:''}Validez de la oferta: ${num(s.validez)} días.</div>
+    ${s.obs?`<div style="margin-top:6px">${esc(s.obs).replace(/\n/g,'<br>')}</div>`:''}
+    ${T.condiciones?`<div style="margin-top:10px;font-size:10px;color:#444">${esc(T.condiciones).replace(/\n/g,'<br>')}</div>`:''}
+    <div style="margin-top:40px;display:flex;justify-content:space-between"><div>Conforme cliente:<br><br>____________________</div><div>Por ${esc(E.nombre)}:<br><br>____________________</div></div>`;
 }
 
+// ---------- Lista ----------
+const loadList = () => readJSON(KEY, []);
 function renderList(){
-  const list = load();
+  const list = loadList(), q = $('search').value.toLowerCase(), f = $('filter').value;
   $('count').textContent = list.length ? `(${list.length})` : '';
-  $('rows').innerHTML = list.length ? list.slice().reverse().map(p => `
+  const rows = list.slice().reverse().filter(p => (!f || p.estado===f) && (!q || (p.ref+' '+p.cliente).toLowerCase().includes(q)));
+  $('rows').innerHTML = rows.length ? rows.map(p => `
     <tr>
       <td><b>${esc(p.ref)}</b></td>
-      <td>${new Date(p.fecha).toLocaleDateString('es-ES')}</td>
+      <td>${fmtDate(p.fecha)}</td>
       <td>${esc(p.cliente||'—')}<div style="color:var(--muted);font-size:12px">${esc(p.telefono||'')}</div></td>
-      <td>Sprinter ${MODELS.find(m=>m.id===p.model).label}<div style="color:var(--muted);font-size:12px">${esc(p.opts.color)}</div></td>
-      <td>${pending(p).length ? `<span class="tag consultar">${pending(p).length}</span> <span style="font-size:12px;color:var(--muted)">${pending(p).map(esc).join(', ')}</span>` : '<span class="tag si">Nada</span>'}</td>
-      <td>${p.precio?Number(p.precio).toLocaleString('es-ES')+' €':'—'}</td>
+      <td>Sprinter ${model(p).label}${pending(p).length?`<div><span class="tag consultar">${pending(p).length} a consultar</span></div>`:''}</td>
+      <td class="r"><b>${eur(calc(p).total)}</b></td>
+      <td><select data-st="${esc(p.ref)}">${ESTADOS.map(e=>`<option ${e===p.estado?'selected':''}>${e}</option>`).join('')}</select></td>
       <td style="white-space:nowrap"><button class="btn" data-open="${esc(p.ref)}">Abrir</button> <button class="btn danger" data-del="${esc(p.ref)}">Borrar</button></td>
-    </tr>`).join('') : `<tr><td colspan="7" class="empty">Aún no hay pedidos guardados.</td></tr>`;
+    </tr>`).join('') : `<tr><td colspan="7" class="empty">${list.length?'Ningún presupuesto coincide.':'Aún no hay presupuestos guardados.'}</td></tr>`;
 }
 
-function syncForm(){ ['cliente','telefono','email','precio','obs'].forEach(k => $(k).value = state[k] || ''); }
-function renderAll(){ renderModels(); renderGroups(); renderSummary(); }
+// ---------- Tarifas (vista) ----------
+function renderTarifas(){
+  document.querySelectorAll('[data-emp]').forEach(el => el.value = tarifa.empresa[el.dataset.emp] || '');
+  document.querySelectorAll('[data-def]').forEach(el => el.value = tarifa[el.dataset.def] ?? '');
+  $('tarModels').innerHTML = MODELS.map(m => `<div class="opt"><div class="t">Sprinter ${m.label} plazas</div>
+    <input class="money" type="number" min="0" step="100" data-tb="${m.id}" value="${num(tarifa.base[m.id])||''}" placeholder="0 €"></div>`).join('');
+  $('tarOpts').innerHTML = GROUPS.map(g => `<div class="sub">${g.title}</div><div class="opts">${g.items.map(i =>
+    i.type==='tri'
+      ? `<div class="opt"><div class="t">${i.t}</div><input class="money" type="number" min="0" step="10" data-te="${i.id}" value="${num(tarifa.extras[i.id])||''}" placeholder="0 €"></div>`
+      : i.options.map(o => `<div class="opt"><div class="t">${i.t}: ${esc(o)}</div><input class="money" type="number" min="0" step="10" data-ts="${i.id}" data-to="${esc(o)}" value="${num(tarifa.sel[i.id]?.[o])||''}" placeholder="0 €"></div>`).join('')
+  ).join('')}</div>`).join('');
+}
+
 function show(v){
-  $('viewConf').classList.toggle('hidden', v!=='conf'); $('viewList').classList.toggle('hidden', v!=='list');
-  $('tabConf').classList.toggle('active', v==='conf'); $('tabList').classList.toggle('active', v==='list');
+  ['Conf','List','Tar'].forEach(k => $('view'+k).classList.toggle('hidden', k.toLowerCase()!==v));
+  document.querySelectorAll('nav [data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab===v));
   if(v==='list') renderList();
+  if(v==='tar') renderTarifas();
+  if(v==='conf') renderConf();
+  window.scrollTo(0,0);
 }
 
-// Eventos
+// ---------- Eventos ----------
+document.querySelector('nav').addEventListener('click', e => { const b=e.target.closest('[data-tab]'); if(b) show(b.dataset.tab); });
 $('models').addEventListener('click', e => { const b=e.target.closest('[data-m]'); if(!b) return; state.model=+b.dataset.m; renderModels(); renderSummary(); });
 $('groups').addEventListener('click', e => {
   const b=e.target.closest('.seg button'); if(!b) return;
   state.opts[b.parentElement.dataset.o] = b.dataset.v;
   b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x===b));
-  renderSummary();
+  refreshPriceLabels(); renderSummary();
 });
-$('groups').addEventListener('change', e => { if(e.target.dataset.s){ state.opts[e.target.dataset.s]=e.target.value; renderSummary(); } });
-['cliente','telefono','email','precio','obs'].forEach(k => $(k).addEventListener('input', e => state[k]=e.target.value));
+$('groups').addEventListener('change', e => { if(e.target.dataset.s){ state.opts[e.target.dataset.s]=e.target.value; refreshPriceLabels(); renderSummary(); } });
+FIELDS.forEach(k => $(k).addEventListener('input', e => { state[k]=e.target.value; renderSummary(); }));
+$('addExtra').onclick = () => { state.extras.push({concepto:'',importe:''}); renderExtras(); };
+$('extras').addEventListener('input', e => { const k=e.target.dataset.ex; if(k!=null){ state.extras[k][e.target.dataset.f]=e.target.value; renderSummary(); } });
+$('extras').addEventListener('click', e => { const k=e.target.dataset.rm; if(k!=null){ state.extras.splice(k,1); renderExtras(); renderSummary(); } });
 
 $('save').onclick = () => {
-  const list = load();
+  const list = loadList();
   if(!state.ref){
     const y = new Date().getFullYear();
-    const nums = list.filter(p=>p.ref.startsWith(`TB-${y}-`)).map(p=>+p.ref.split('-')[2]);
-    state.ref = `TB-${y}-${String((nums.length?Math.max(...nums):0)+1).padStart(3,'0')}`;
+    const nums = list.filter(p=>p.ref.startsWith(`P-${y}-`)).map(p=>+p.ref.split('-')[2]);
+    state.ref = `P-${y}-${String((nums.length?Math.max(...nums):0)+1).padStart(3,'0')}`;
     state.fecha = Date.now();
   }
+  if(!state.tarifa) state.tarifa = clone(tarifa); // congela los precios usados
   const i = list.findIndex(p=>p.ref===state.ref);
-  const copy = JSON.parse(JSON.stringify(state));
-  if(i>=0) list[i]=copy; else list.push(copy);
-  toast(store(list) ? `Pedido ${state.ref} guardado` : 'No se pudo guardar en este navegador');
-  renderList();
+  if(i>=0) list[i]=clone(state); else list.push(clone(state));
+  toast(writeJSON(KEY, list) ? `Presupuesto ${state.ref} guardado` : 'No se pudo guardar en este navegador');
+  renderSummary(); renderList();
 };
 $('printBtn').onclick = () => { renderPrint(state); window.print(); };
-$('wa').onclick = () => {
-  const tel = (state.telefono||'').replace(/\D/g,'');
-  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(textSummary(state))}`, '_blank');
-};
+$('wa').onclick = () => window.open(`https://wa.me/${(state.telefono||'').replace(/\D/g,'')}?text=${encodeURIComponent(textSummary(state))}`, '_blank');
 $('mail').onclick = () => {
-  location.href = `mailto:${encodeURIComponent(state.email||'')}?subject=${encodeURIComponent(title(state)+(state.ref?' — '+state.ref:''))}&body=${encodeURIComponent(textSummary(state).replace(/\*/g,''))}`;
+  location.href = `mailto:${encodeURIComponent(state.email||'')}?subject=${encodeURIComponent('Presupuesto '+(state.ref||'')+' — '+title(state))}&body=${encodeURIComponent(textSummary(state).replace(/\*/g,''))}`;
 };
-$('reset').onclick = () => { state=fresh(); syncForm(); renderAll(); toast('Nueva configuración'); };
-$('tabConf').onclick = () => show('conf');
-$('tabList').onclick = () => show('list');
+$('dup').onclick = () => {
+  state = Object.assign(clone(state), {ref:null, fecha:null, tarifa:null, estado:'Borrador'});
+  renderConf(); toast('Copia creada con la tarifa actual. Guárdala para darle número.');
+};
+$('reset').onclick = () => { state=fresh(); syncForm(); renderConf(); toast('Nuevo presupuesto'); };
+
+$('search').oninput = renderList;
+$('filter').innerHTML += ESTADOS.map(e=>`<option>${e}</option>`).join('');
+$('filter').onchange = renderList;
+$('rows').addEventListener('change', e => {
+  const r = e.target.dataset.st; if(!r) return;
+  const list = loadList(), p = list.find(x=>x.ref===r); p.estado = e.target.value; writeJSON(KEY, list);
+  if(state.ref===r) state.estado = p.estado;
+});
 $('rows').addEventListener('click', e => {
   const o=e.target.dataset.open, d=e.target.dataset.del;
-  if(o){ state = JSON.parse(JSON.stringify(load().find(p=>p.ref===o))); ALL.forEach(i=>{ if(!(i.id in state.opts)) state.opts[i.id]=i.def; }); syncForm(); renderAll(); show('conf'); }
-  if(d && confirm(`¿Borrar el pedido ${d}?`)){ store(load().filter(p=>p.ref!==d)); renderList(); }
+  if(o){ state = Object.assign(fresh(), clone(loadList().find(p=>p.ref===o))); ALL.forEach(i=>{ if(!(i.id in state.opts)) state.opts[i.id]=i.def; }); syncForm(); show('conf'); }
+  if(d && confirm(`¿Borrar el presupuesto ${d}?`)){ writeJSON(KEY, loadList().filter(p=>p.ref!==d)); renderList(); }
 });
 $('exportBtn').onclick = () => {
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(load(),null,2)],{type:'application/json'}));
-  a.download=`pedidos-torresbus-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({presupuestos:loadList(), tarifa},null,2)],{type:'application/json'}));
+  a.download=`presupuestos-${new Date().toISOString().slice(0,10)}.json`; a.click();
 };
 $('importFile').onchange = async e => {
   try{
-    const inc = JSON.parse(await e.target.files[0].text());
-    const list = load(); inc.forEach(p => { if(p.ref && !list.some(x=>x.ref===p.ref)) list.push(p); });
-    store(list); renderList(); toast('Pedidos importados');
+    const data = JSON.parse(await e.target.files[0].text());
+    const inc = Array.isArray(data) ? data : data.presupuestos || [];
+    const list = loadList(); inc.forEach(p => { if(p.ref && !list.some(x=>x.ref===p.ref)) list.push(p); });
+    writeJSON(KEY, list);
+    if(data.tarifa && confirm('¿Cargar también las tarifas de la copia? (sustituye las actuales)')){ tarifa = Object.assign(defaultTarifa(), data.tarifa); saveTarifa(); }
+    renderList(); toast('Copia importada');
   }catch(err){ toast('Archivo no válido'); }
   e.target.value='';
 };
 
-renderAll(); renderList();
+$('viewTar').addEventListener('input', e => {
+  const d = e.target.dataset;
+  if(d.emp) tarifa.empresa[d.emp] = e.target.value;
+  else if(d.def) tarifa[d.def] = e.target.type==='number' ? num(e.target.value) : e.target.value;
+  else if(d.tb) tarifa.base[d.tb] = num(e.target.value);
+  else if(d.te) tarifa.extras[d.te] = num(e.target.value);
+  else if(d.ts) (tarifa.sel[d.ts] ||= {})[d.to] = num(e.target.value);
+  else return;
+  saveTarifa();
+});
+
+syncForm(); renderConf(); renderList();
 </script>
 </body>
 </html>
